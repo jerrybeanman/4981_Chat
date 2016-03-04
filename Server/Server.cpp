@@ -58,9 +58,9 @@ int Server::Accept(Client * client)
 
     _ClientList.push_back(*client);
 
-    sprintf(buf, "Player %d has joined the lobby\n", _ClientList.size());
+    sprintf(buf, "Player %d has joined the lobby\n", (int)_ClientList.size());
 
-    printf(buf);
+    printf("%s",buf);
     this->Server::Broadcast(buf);
     _NewClient = *client;
     return client->id;
