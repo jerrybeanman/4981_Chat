@@ -57,12 +57,12 @@
           <item row="0" column="0">
            <widget class="QLabel" name="iPAddressLabel_1">
             <property name="text">
-             <string>IP Address</string>
+             <string>Server Address</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="iPAddressLineEdit_1">
+           <widget class="QLineEdit" name="serverIPAddress">
             <property name="maximumSize">
              <size>
               <width>100</width>
@@ -77,15 +77,15 @@
           <item row="1" column="0">
            <widget class="QLabel" name="userNameLabel_1">
             <property name="text">
-             <string>UserName</string>
+             <string>Username</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="userNameLineEdit_1"/>
+           <widget class="QLineEdit" name="userNameInput"/>
           </item>
           <item row="2" column="1">
-           <widget class="QPushButton" name="pushButton_1">
+           <widget class="QPushButton" name="enterChat">
             <property name="text">
              <string>Enter Chat Room</string>
             </property>
@@ -130,7 +130,7 @@
                </attribute>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
-                 <widget class="QListView" name="listView_2">
+                 <widget class="QListWidget" name="chatMenu">
                   <property name="maximumSize">
                    <size>
                     <width>500</width>
@@ -161,30 +161,15 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QPlainTextEdit" name="plainTextEdit">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>25</height>
-                 </size>
-                </property>
-                <property name="verticalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="horizontalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="tabChangesFocus">
-                 <bool>true</bool>
-                </property>
-                <property name="documentTitle">
-                 <string/>
-                </property>
-                <property name="overwriteMode">
-                 <bool>true</bool>
+               <widget class="QLineEdit" name="inputField">
+                <property name="acceptDrops">
+                 <bool>false</bool>
                 </property>
                 <property name="placeholderText">
                  <string>Chat!</string>
+                </property>
+                <property name="clearButtonEnabled">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -208,7 +193,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QListView" name="listView">
+             <widget class="QListWidget" name="userList">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
                 <horstretch>0</horstretch>

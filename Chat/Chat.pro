@@ -14,6 +14,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         ui.cpp
 
+QMAKE_CXXFLAGS += -std=c++11
+
 HEADERS  += ui.h
 
 FORMS    += ui.ui
