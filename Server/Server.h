@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sstream>      // std::istringstream
 
 #define MAX_CONNECTIONS  20
 #define PACKET_LEN       256
@@ -32,14 +31,14 @@ class Server
         Server(){}
         ~Server(){}
         /*-----------------------------------------------------------------------------------------------
-        --    Initialize socket, server address to lookup to, and connect to the server
+        --    Initialize socket, and its own server address
         --
         --    Interface:  int InitializeSocket(short port)
         --                [port] Port number
         --
         --    programmer: Jerry Jia
         --
-        --    @return: socket file descriptor
+        --    @return: -1 on failure, 0 on success
         ------------------------------------------------------------------------------------------------*/
         int InitializeSocket(short port);
 
@@ -64,7 +63,7 @@ class Server
         --
         --    Programmer: Jerry Jia
         --
-        --    return: child PDI (0 for child process)
+        --    return: Recieve() address
         -------------------------------------------------------------------------------------------------*/
         static void * CreateClientManager(void * server);
 
