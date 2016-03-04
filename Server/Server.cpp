@@ -45,7 +45,6 @@ int Server::InitializeSocket(short port)
 */
 int Server::Accept(Client * client)
 {
-    char                buf[PACKET_LEN];
     unsigned int        ClientLen = sizeof(client->connection);
     /* Accepts a connection from the client */
     if ((client->socket = accept(_ListeningSocket, (struct sockaddr *)&client->connection, &ClientLen)) == -1)
@@ -58,10 +57,6 @@ int Server::Accept(Client * client)
 
     _ClientList.push_back(*client);
 
-    sprintf(buf, "Player %d has joined the lobby\n", (int)_ClientList.size());
-
-    printf("%s",buf);
-    this->Server::Broadcast(buf);
     _NewClient = *client;
     return client->id;
 }
@@ -103,6 +98,7 @@ void * Server::Receive()
         if(BytesRead == 0) /* client disconnected */
         {
             printf("Player %d has left the lobby \n", TmpCLient.id + 1);
+            _ClientList.erase(_ClientList.begin() + TmpCLient.id - 1);
             return 0;
         }
 
