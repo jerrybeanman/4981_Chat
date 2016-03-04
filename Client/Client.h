@@ -4,12 +4,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <utility>
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <vector>
 #include <stdlib.h>
 #include <string.h>
@@ -61,7 +61,7 @@ class Client
 
           void * Receive();
 
-          int Send(char * message, int size);
+          int Send(const char * message, int size);
 
 
   private:

@@ -7,7 +7,6 @@
 #include <netdb.h>
 #include <vector>
 #include <unistd.h>
-#include <pthread.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>

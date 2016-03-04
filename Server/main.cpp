@@ -1,13 +1,15 @@
+#include <pthread.h>
 #include "Server.h"
 
 using namespace std;
 
+#define PORT 7000
 int main()
 {
     int rc;
     Server TCPServer;
 
-    if((rc = TCPServer.InitializeSocket(7000)) != 0)
+    if((rc = TCPServer.InitializeSocket(PORT)) != 0)
     {
         std::cerr << "TCP Server initialization failed." << std::endl;
         return -1;

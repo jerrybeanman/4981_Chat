@@ -2,7 +2,6 @@
 
 int Client::InitializeSocket(const char * name, short port)
 {
-    struct hostent* host;
 
     // create TCP socket
     if((_ClientSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -11,20 +10,13 @@ int Client::InitializeSocket(const char * name, short port)
         return -1;
     }
 
+
     //set up port and protocol of address structure
     memset(&_ServerAddress, 0, sizeof(_ServerAddress));
     _ServerAddress.sin_family      = AF_INET;
     _ServerAddress.sin_port        = htons(port);
+    _ServerAddress.sin_addr.s_addr = inet_addr(name);
 
-    if((host = gethostbyname(name)) == 0)
-    {
-        std::cout << "Error in gethostbyname" << std::endl;
-        return -1;
-    }
-
-    memcpy(&_ServerAddress.sin_addr, host->h_addr, host->h_length);
-
-    free(host);
     return 0;
 }
 
@@ -76,7 +68,7 @@ void * Client::Receive()
     Wrapper function for TCP send function. Failing to send prints an error
     message with the data intended to send.
 */
-int Client::Send(char * message, int size)
+int Client::Send(const char * message, int size)
 {
     if (send(_ClientSocket, message, size, 0) == -1)
     {

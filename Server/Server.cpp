@@ -89,9 +89,6 @@ void * Server::Receive()
     Client TmpCLient = _NewClient;
     int BytesRead;
     char * buf;						          	/* buffer read from one recv call      	  */
-    int code;
-    int idValue;
-    int team;
 
     buf = (char *)malloc(PACKET_LEN); 	/* allocates memory 							        */
     while (1)
@@ -125,7 +122,7 @@ void Server::Broadcast(char * message)
 {
     for(std::vector<int>::size_type i = 0; i != _ClientList.size(); i++)
     {
-        if(send(_ClientList[i].socket, message, sizeof(message), 0) == -1)
+        if(send(_ClientList[i].socket, message, PACKET_LEN, 0) == -1)
         {
             std::cerr << "Broadcast() failed for player id: " << _ClientList[i].id + 1 << std::endl;
             std::cerr << "errno: " << errno << std::endl;
