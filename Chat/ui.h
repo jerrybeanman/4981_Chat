@@ -17,7 +17,7 @@ public:
     ~UI();
     void updateChatMenu(char *input);
     void updateUserList(char *user);
-    void generateWhisperPage();
+    void generateWhisperPage(char *whisperName);
 private slots:
     void getUserInput();
     void exit();

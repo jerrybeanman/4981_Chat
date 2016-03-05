@@ -1,6 +1,8 @@
 #include "ui.h"
 #include "ui_ui.h"
 #include <QMessageBox>
+#include <QListView>
+#include <QListWidget>
 
 UI::UI(QWidget *parent) :
     QMainWindow(parent),
@@ -8,9 +10,11 @@ UI::UI(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->menuBar->setStyleSheet("background:##388E3C");
+    generateWhisperPage("Scott");
     connect(ui->inputField, SIGNAL(returnPressed()), this, SLOT(getUserInput()));
     connect(ui->menuSettings->actions().at(2), SIGNAL(triggered(bool)), this, SLOT(exit()));
     connect(ui->enterChat, SIGNAL(clicked(bool)), this, SLOT(on_enterChat_pressed()));
+    connect(ui->userNameInput, SIGNAL(returnPressed()), this, SLOT(on_enterChat_pressed()));
 }
 
 UI::~UI()
@@ -67,15 +71,23 @@ void UI::on_enterChat_pressed()
     updateUserList(userName.toLatin1().data());
 }
 
-void UI::generateWhisperPage() {
-    //ui->tabWidget->addTab(new QWidget(), "Test Tab");
+void UI::generateWhisperPage(char *whisperName) {
+    QVBoxLayout *layout = new QVBoxLayout();
+    QListWidget *chatItems = new QListWidget();
+    chatItems->setWrapping(true);
+    chatItems->setWordWrap(true);
+    chatItems->setAutoScroll(true);
+    layout->addWidget(chatItems);
+
+    QWidget *whisperTab = new QWidget();
+    whisperTab->setLayout(layout);
+    ui->tabWidget->addTab(whisperTab, whisperName);
 }
 
 void UI::getUserInput() {
     QString input = ui->inputField->text();
     ui->chatMenu->addItem(input);
     ui->inputField->clear();
-    generateWhisperPage();
     //Call send function (char *) input.toLatin1().data();
 }
 
