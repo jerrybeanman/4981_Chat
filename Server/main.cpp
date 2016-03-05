@@ -1,4 +1,3 @@
-#include <pthread.h>
 #include "Server.h"
 
 using namespace std;
@@ -6,33 +5,46 @@ using namespace std;
 #define PORT 7000
 int main()
 {
-    int rc;
+    fd_set Rset;
     Server TCPServer;
+    int    RetVal;
+    int    MaxIndex = -1;
+    int    NumClients;
 
-    if((rc = TCPServer.InitializeSocket(PORT)) != 0)
+    if(TCPServer.InitializeSocket(PORT) != 0)
     {
-        std::cerr << "TCP Server initialization failed." << std::endl;
+        std::cerr << "Server::InitializeSocket() failed" << std::endl;
         return -1;
     }
 
-    std::cerr << "TCP Server initialized." << std::endl;
+    std::cerr << "Server running..." << std::endl;
 
     while(1)
     {
-        /* assign it into the player object if we want to manipulate the thread */
-        pthread_t readThread;
+        Client tmpClient;
+        Rset = TCPServer.AllSet;
+        NumClients = select(TCPServer.MaxSocket + 1, &Rset, NULL, NULL, NULL);
 
-        int clientID;
-        struct Client client;
-        if ((clientID = TCPServer.Accept(&client)) == -1)
+        if(FD_ISSET(TCPServer.ListeningSocket, &Rset))
         {
-            std::cerr << "rip.\n" << std::endl;
+            if((RetVal = TCPServer.Accept(&tmpClient)) < 0)
+                break;
+             if(RetVal > MaxIndex)
+                 MaxIndex = RetVal;
+            if(--NumClients <= 0)
+                continue;
         }
-
-        /* Creates the thread to handle new clients */
-        if(pthread_create(&readThread, NULL, &Server::CreateClientManager, (void *) &TCPServer) < 0)
+        for(int i = 0; i <= MaxIndex; i++)
         {
-            std::cerr << "thread creation failed" << std::endl;
+            if(TCPServer.ClientList[i].socket < 0)
+                continue;
+            if(FD_ISSET(TCPServer.ClientList[i].socket, &Rset))
+            {
+                if(TCPServer.Receive(i) < 0)
+                    return -1;
+                if(--NumClients <= 0)
+                    break;
+            }
         }
     }
 

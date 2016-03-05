@@ -9,14 +9,14 @@ int Server::InitializeSocket(short port)
 {
     int optval = -1;
     /* Create a TCP streaming socket */
-    if ((_ListeningSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1 )
+    if ((ListeningSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1 )
     {
         std::cout << "socket() failed with errno " << errno << std::endl;
         return -1;
     }
 
     /* Allows other sockets to bind() to this port, unless there is an active listening socket bound to the port already. */
-    setsockopt(_ListeningSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    setsockopt(ListeningSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
     /* Fill in server address information */
     memset(&_ServerAddress, 0, sizeof(struct sockaddr_in));
@@ -25,14 +25,22 @@ int Server::InitializeSocket(short port)
     _ServerAddress.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
 
     /* bind server address to accepting socket */
-    if (bind(_ListeningSocket, (struct sockaddr *)&_ServerAddress, sizeof(_ServerAddress)))
+    if (bind(ListeningSocket, (struct sockaddr *)&_ServerAddress, sizeof(_ServerAddress)))
     {
         std::cout << "InitializeSocket: bind() failed with errno " << errno << std::endl;
         return -1;
     }
 
     /* Listen for connections */
-    listen(_ListeningSocket, MAX_CONNECTIONS);
+    listen(ListeningSocket, MAX_CONNECTIONS);
+
+    MaxSocket = ListeningSocket;
+
+    for(int i =0; i < FD_SETSIZE; i++)
+        ClientList[i].socket = -1;
+
+    FD_ZERO(&AllSet);
+    FD_SET(ListeningSocket, &AllSet);
 
     return 0;
 }
@@ -45,32 +53,36 @@ int Server::InitializeSocket(short port)
 */
 int Server::Accept(Client * client)
 {
-    unsigned int        ClientLen = sizeof(client->connection);
+    int             i;
+    unsigned int    ClientLen = sizeof(client->connection);
+
     /* Accepts a connection from the client */
-    if ((client->socket = accept(_ListeningSocket, (struct sockaddr *)&client->connection, &ClientLen)) == -1)
+    if ((client->socket = accept(ListeningSocket, (struct sockaddr *)&client->connection, &ClientLen)) == -1)
     {
         std::cerr << "Accept() failed with errno" << errno << std::endl;
         return -1;
     }
-    /* Not the best way to do it since we're using vectors */
-    client->id = _ClientList.size();
 
-    _ClientList.push_back(*client);
+    std::cout << "Client Connect! Remote Address: " << inet_ntoa(client->connection.sin_addr) << std::endl;
 
-    _NewClient = *client;
-    return client->id;
-}
+    for(i = 0; i < FD_SETSIZE; i++)
+    {
+        if(ClientList[i].socket < 0)
+        {
+            ClientList[i] = *client;
+            break;
+        }
+    }
+    if(i == FD_SETSIZE)
+    {
+        std::cerr << "Too many clients to accept" << std::endl;
+        return -1;
+    }
+    FD_SET(client->socket, &AllSet);
+    if(client->socket > MaxSocket)
+        MaxSocket = client->socket;
 
-
-/*
-	Creates a child process to handle incoming messages from new player that has just connected to the lobby
-
-	@return: child PDI (0 for child process)
-*/
-void * Server::CreateClientManager(void * server)
-{
-    /* God forbid */
-    return ((Server *)server)->Receive();
+    return i;
 }
 
 
@@ -79,33 +91,37 @@ void * Server::CreateClientManager(void * server)
 
 	@return: 1 on success, -1 on error, 0 on disconnect
 */
-void * Server::Receive()
+int Server::Receive(int index)
 {
-    Client TmpCLient = _NewClient;
     int BytesRead;
     char * buf;						          	/* buffer read from one recv call      	  */
+    std::string packet;
 
-    buf = (char *)malloc(PACKET_LEN); 	/* allocates memory 							        */
-    while (1)
+    buf = (char *)malloc(PACKET_LEN); 	        /* allocates memory 	    			  */
+
+    while((BytesRead = recv (ClientList[index].socket, buf, PACKET_LEN, 0)) < PACKET_LEN)
     {
-        BytesRead = recv (TmpCLient.socket, buf, PACKET_LEN, 0);
-
         if(BytesRead < 0) /* recv() failed */
         {
             printf("recv() failed with errno: %d", errno);
-            return 0;
+            return -1;
         }
-        if(BytesRead == 0) /* client disconnected */
-        {
-            printf("Player %d has left the lobby \n", TmpCLient.id + 1);
-            _ClientList.erase(_ClientList.begin() + TmpCLient.id - 1);
-            return 0;
-        }
-
-        std::cout << buf << std::endl;
-        /* Broadcast echo packet back to all players */
-        this->Server::Broadcast(buf);
+        packet += buf;
     }
+
+    if(BytesRead == 0) /* client disconnected */
+    {
+        printf("Client %d has left the lobby \n",  index+1);
+        close(ClientList[index].socket);
+        FD_CLR(ClientList[index].socket, &AllSet);
+        return 0;
+    }
+
+    std::cout << buf << std::endl;
+
+    /* Broadcast echo packet back to all players */
+
+    this->Server::Broadcast(buf);
     free(buf);
     return 0;
 }
@@ -116,11 +132,11 @@ void * Server::Receive()
 */
 void Server::Broadcast(char * message)
 {
-    for(std::vector<int>::size_type i = 0; i != _ClientList.size(); i++)
+    for(int i = 0; ClientList[i].socket !=  -1; i++)
     {
-        if(send(_ClientList[i].socket, message, PACKET_LEN, 0) == -1)
+        if(send(ClientList[i].socket, message, PACKET_LEN, 0) == -1)
         {
-            std::cerr << "Broadcast() failed for player id: " << _ClientList[i].id + 1 << std::endl;
+            std::cerr << "Broadcast() failed for player id: " << ClientList[i].id + 1 << std::endl;
             std::cerr << "errno: " << errno << std::endl;
             return;
         }

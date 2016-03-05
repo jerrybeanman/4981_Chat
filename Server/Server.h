@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <vector>
 #include <unistd.h>
@@ -12,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iterator>
+#include <string>
 
 #define MAX_CONNECTIONS  20
 #define PACKET_LEN       256
@@ -27,9 +29,23 @@ struct Client
 class Server
 {
     public:
+        /*--------------------------
+        -- Public Variables Field --
+        ---------------------------*/
+        fd_set                 AllSet;
+        Client                 ClientList[FD_SETSIZE];
+        int 				   ListeningSocket;
+        int                    MaxSocket;
 
+        /*--------------------------
+        -- Constructor            --
+        ---------------------------*/
         Server(){}
         ~Server(){}
+
+        /*--------------------------
+        -- Function Prototypes    --
+        ---------------------------*/
         /*-----------------------------------------------------------------------------------------------
         --    Initialize socket, and its own server address
         --
@@ -76,7 +92,7 @@ class Server
         --
         --        @return: Thread execution code
         -------------------------------------------------------------------------------------------------*/
-        void * Receive();
+        int Receive(int index);
 
         /*-----------------------------------------------------------------------------------------------
         --    Sends a message to all the clients
@@ -90,10 +106,8 @@ class Server
         void Broadcast(char * message);
 
     private:
-        Client                 _NewClient;
         struct sockaddr_in     _ServerAddress;
-        int 				   _ListeningSocket;
-        std::vector<Client>    _ClientList;
+
 
 };
 

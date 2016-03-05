@@ -28,7 +28,7 @@ int main()
 
     while(std::getline(std::cin, message))
     {
-        if(client.Send(message.c_str(), message.size() + 1) < 0)
+        if(client.Send(message.c_str(), PACKET_LEN) < 0)
             return 0;
     }
     return 1;
