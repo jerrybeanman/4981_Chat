@@ -3,6 +3,8 @@
 #include <QMessageBox>
 #include <QListView>
 #include <QListWidget>
+#include <pthread.h>
+#include "Client.h"
 
 UI::UI(QWidget *parent) :
     QMainWindow(parent),
@@ -29,15 +31,15 @@ void UI::exit() {
     ui->stackedWidget->setCurrentIndex(0);
 }
 
-char *UI::getServerAddress() {
+QByteArray UI::getServerAddress() {
     QString serverIP = ui->serverIPAddress->text();
     if(serverIP == "...") {
         return nullptr;
     }
-    return (char *)serverIP.toLatin1().data();
+    return serverIP.toLocal8Bit();
 }
 
-char *UI::getUserName() {
+QByteArray UI::getUserName() {
     QString name = ui->userNameInput->text();
     if(name.isEmpty()) {
         return nullptr;
@@ -45,33 +47,47 @@ char *UI::getUserName() {
     this->userName = name;
     name.prepend("1 User: ");
     name.append(" connected");
-    return (char *)name.toLatin1().data();
+    return name.toLocal8Bit();
 
 }
 
 void UI::on_enterChat_pressed()
 {   QMessageBox loginError;
-    char *ipAddr = getServerAddress();
-    if(ipAddr == nullptr) {
+    QByteArray ipAddr = getServerAddress();
+    if(ipAddr.isEmpty()) {
         loginError.critical(0, "Login Error", "Enter a valid IP address");
         loginError.setFixedSize(500,200);
         return;
     }
-    char *userConnectInfo = getUserName();
-    if(userConnectInfo == nullptr) {
+    QByteArray userConnectInfo = getUserName();
+    if(userConnectInfo.isEmpty()) {
         loginError.critical(0, "Login Error", "Enter a username");
         loginError.setFixedSize(500,200);
         return;
     }
-    //connect to server
-    //send connect information to the server
+
+    if(client.InitializeSocket(ipAddr, PORT) < 0) {
+            return;
+    }
+
+    if(client.Connect() < 0) {
+        return;
+    }
+
+    client.Send(userConnectInfo.data());
+
+    pthread_t readThread;
+    if(pthread_create(&readThread, NULL, &Client::RecvThread, (void *) &client) < 0) {
+          return;
+    }
+
     ui->userNameInput->clear();
     ui->serverIPAddress->clear();
     ui->stackedWidget->setCurrentIndex(1);
     updateUserList(userName.toLatin1().data());
 }
 
-void UI::generateWhisperPage(char *whisperName) {
+void UI::generateWhisperPage(QByteArray whisperName) {
     QVBoxLayout *layout = new QVBoxLayout();
     QListWidget *chatItems = new QListWidget();
     chatItems->setWrapping(true);
@@ -88,15 +104,15 @@ void UI::getUserInput() {
     QString input = ui->inputField->text();
     ui->chatMenu->addItem(input);
     ui->inputField->clear();
-    //Call send function (char *) input.toLatin1().data();
+    client.Send(input.toLocal8Bit().data());
 }
 
-void UI::updateChatMenu(char *input) {
+void UI::updateChatMenu(QByteArray input) {
     QString newChatInput(input);
     ui->chatMenu->addItem(newChatInput);
 }
 
-void UI::updateUserList(char *user) {
+void UI::updateUserList(QByteArray user) {
     QString newUser(user);
     ui->userList->addItem(newUser);
 }

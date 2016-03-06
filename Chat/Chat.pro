@@ -12,11 +12,13 @@ TARGET = Chat
 TEMPLATE = app
 
 SOURCES += main.cpp\
-        ui.cpp
+        ui.cpp \
+    Client.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
-HEADERS  += ui.h
+HEADERS  += ui.h \
+    Client.h
 
 FORMS    += ui.ui
 

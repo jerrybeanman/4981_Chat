@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 #include <QString>
-
+#include <QByteArray>
+#include "Client.h"
 namespace Ui {
 class UI;
 }
@@ -15,9 +16,9 @@ class UI : public QMainWindow
 public:
     explicit UI(QWidget *parent = 0);
     ~UI();
-    void updateChatMenu(char *input);
-    void updateUserList(char *user);
-    void generateWhisperPage(char *whisperName);
+    void updateChatMenu(QByteArray input);
+    void updateUserList(QByteArray user);
+    void generateWhisperPage(QByteArray whisperName);
 private slots:
     void getUserInput();
     void exit();
@@ -26,8 +27,9 @@ private slots:
 private:
     Ui::UI *ui;
     QString userName;
-    char *getServerAddress();
-    char *getUserName();
+    Client client;
+    QByteArray getServerAddress();
+    QByteArray getUserName();
 };
 
 #endif // UI_H
