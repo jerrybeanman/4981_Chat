@@ -51,7 +51,14 @@ void * Client::Receive()
             if(bytesRead < 0)
             {
                 printf("recv() failed with errno: %d\n", errno);
+                free(message);
                 return (void *)errno;
+            }
+            if(bytesRead == 0)
+            {
+                printf("Server has closed the socket\n");
+                free(message);
+                return NULL;
             }
             message += bytesRead;
             bytesToRead -= bytesRead;
