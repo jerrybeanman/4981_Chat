@@ -1,6 +1,19 @@
 #include "Client.h"
 #include "ui.h"
 
+/*-----------------------------------------------------------------------------------------------
+--    Name:     [InitializeSocket]         Date:         [March 6th, 2016]
+--
+--    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+--
+--    Interface:  int InitializeSocket(const char * name, short port)
+--                [name] IP address of peer host
+--                [port] Port number
+--
+--    @return: -1 on failure, 0 on success
+--
+--    Notes: Initialize _ClientSocket and _ServerAddress, and attempt to connect to a peer host
+------------------------------------------------------------------------------------------------*/
 int Client::InitializeSocket(const char * name, short port)
 {
 
@@ -21,7 +34,17 @@ int Client::InitializeSocket(const char * name, short port)
     return 0;
 }
 
-
+/*-----------------------------------------------------------------------------------------------
+--    Name:     [Connect]                  Date:         [March 6th, 2016]
+--
+--    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+--
+--    Interface:  int Connect()
+--
+--    @return: -1 on failure, 0 on success
+--
+--    Notes: Wrapper for connect
+------------------------------------------------------------------------------------------------*/
 int Client::Connect()
 {
     //Connect to Server
@@ -39,6 +62,18 @@ void * Client::RecvThread(void * client)
     return ((Client *)client)->Receive();
 }
 
+/*-----------------------------------------------------------------------------------------------
+--    Name:     [Receive]                  Date:         [March 6th, 2016]
+--
+--    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+--
+--    Interface:  void * Receive()
+--
+--    @return: void
+--
+--    Notes: Continuously calls recieve in a thread, and updates the application GUI whenever a
+--            message has been read from _ClientSocket
+------------------------------------------------------------------------------------------------*/
 void * Client::Receive()
 {
     int bytesRead;
@@ -73,10 +108,17 @@ void * Client::Receive()
     return NULL;
 }
 
-/*
-    Wrapper function for TCP send function. Failing to send prints an error
-    message with the data intended to send.
-*/
+/*-----------------------------------------------------------------------------------------------
+--    Name:     [Receive]                  Date:         [March 6th, 2016]
+--
+--    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+--
+--    Interface: int Send(const char * message);
+--
+--    @return: void
+--
+--    Notes: Wrapper for send()
+------------------------------------------------------------------------------------------------*/
 int Client::Send(const char * message)
 {
     if (send(_ClientSocket, message, PACKET_LEN, 0) == -1)
@@ -87,7 +129,19 @@ int Client::Send(const char * message)
     return 0;
 }
 
-void Client::Close() {
+/*-----------------------------------------------------------------------------------------------
+--    Name:     [Receive]                  Date:         [March 6th, 2016]
+--
+--    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+--
+--    Interface: void Close();
+--
+--    @return: void
+--
+--    Notes: Wrapper for closing a socket
+------------------------------------------------------------------------------------------------*/
+void Client::Close()
+{
 
     close(this->_ClientSocket);
 }

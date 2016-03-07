@@ -19,51 +19,85 @@
 class Client
 {
   public:
-
+        /*--------------------------
+        -- Constructor            --
+        ---------------------------*/
         Client(){}
         ~Client(){}
+
+        /*--------------------------
+        -- Function Prototypes    --
+        ---------------------------*/
         /*-----------------------------------------------------------------------------------------------
-              --    Initialize socket, server address to lookup to, and connect to the server
-              --
-              --    Interface:  int InitializeSocket(short port)
-              --                [name] Server IP address
-              --                [port] Port number
-              --
-              --    programmer: Jerry Jia
-              --
-              --    @return: -1 on failure, 0 on success
+        --    Name:     [InitializeSocket]         Date:         [March 6th, 2016]
+        --
+        --    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+        --
+        --    Interface:  int InitializeSocket(const char * name, short port)
+        --                [name] IP address of peer host
+        --                [port] Port number
+        --
+        --    @return: -1 on failure, 0 on success
+        --
+        --    Notes: Initialize _ClientSocket and _ServerAddress, and attempt to connect to a peer host
         ------------------------------------------------------------------------------------------------*/
         int InitializeSocket(const char* name, short port);
 
 
-          /*-----------------------------------------------------------------------------------------------
-          --    Wrapper for WSAConnect
-          --
-          --    Interface:  int Connect();
-          --
-          --    programmer: Jerry Jia
-          --
-          --    @return: -1 on failure, 0 on success
-          ------------------------------------------------------------------------------------------------*/
-          int Connect();
+        /*-----------------------------------------------------------------------------------------------
+        --    Name:     [Connect]                  Date:         [March 6th, 2016]
+        --
+        --    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+        --
+        --    Interface:  int Connect()
+        --
+        --    @return: -1 on failure, 0 on success
+        --
+        --    Notes: Wrapper for connect
+        ------------------------------------------------------------------------------------------------*/
+        int Connect();
 
-          /*-----------------------------------------------------------------------------------------------
-          --    Thread for recieving so it doesn't block the application
-          --
-          --    Interface:  void * RecvThread(void * client)
-          --                [client] Pointer to a void, which has to be a Client object
-          --
-          --    Programmer: Jerry Jia
-          --
-          --    return: Recv() address
-          -------------------------------------------------------------------------------------------------*/
-          static void * RecvThread(void * client);
+        static void * RecvThread(void * client);
 
-          void * Receive();
+        /*-----------------------------------------------------------------------------------------------
+        --    Name:     [Receive]                  Date:         [March 6th, 2016]
+        --
+        --    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+        --
+        --    Interface:  void * Receive()
+        --
+        --    @return: void
+        --
+        --    Notes: Continuously calls recieve in a thread, and updates the application GUI whenever a
+        --            message has been read from _ClientSocket
+        ------------------------------------------------------------------------------------------------*/
+        void * Receive();
 
-          int Send(const char * message);
+        /*-----------------------------------------------------------------------------------------------
+        --    Name:     [Receive]                  Date:         [March 6th, 2016]
+        --
+        --    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+        --
+        --    Interface: int Send(const char * message);
+        --
+        --    @return: void
+        --
+        --    Notes: Wrapper for send()
+        ------------------------------------------------------------------------------------------------*/
+        int Send(const char * message);
 
-          void Close();
+        /*-----------------------------------------------------------------------------------------------
+        --    Name:     [Receive]                  Date:         [March 6th, 2016]
+        --
+        --    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
+        --
+        --    Interface: void Close();
+        --
+        --    @return: void
+        --
+        --    Notes: Wrapper for closing a socket
+        ------------------------------------------------------------------------------------------------*/
+        void Close();
 
 
 
