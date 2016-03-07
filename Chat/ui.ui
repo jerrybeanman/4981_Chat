@@ -48,20 +48,59 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_1">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <layout class="QFormLayout" name="formLayout_1">
-          <item row="0" column="0">
+          <item row="0" column="1">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1">
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="1">
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="0">
            <widget class="QLabel" name="iPAddressLabel_1">
             <property name="text">
              <string>Server Address</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="serverIPAddress">
             <property name="maximumSize">
              <size>
@@ -74,17 +113,17 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="userNameLabel_1">
             <property name="text">
              <string>Username</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="4" column="1">
            <widget class="QLineEdit" name="userNameInput"/>
           </item>
-          <item row="2" column="1">
+          <item row="5" column="1">
            <widget class="QPushButton" name="enterChat">
             <property name="text">
              <string>Enter Chat Room</string>

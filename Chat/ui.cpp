@@ -4,6 +4,7 @@
 #include <QListView>
 #include <QListWidget>
 #include <pthread.h>
+#include <QTime>
 #include "Client.h"
 
 UI::UI(QWidget *parent) :
@@ -11,8 +12,6 @@ UI::UI(QWidget *parent) :
     ui(new Ui::UI)
 {
     ui->setupUi(this);
-    ui->menuBar->setStyleSheet("background:##388E3C");
-    generateWhisperPage("Scott");
     connect(ui->inputField, SIGNAL(returnPressed()), this, SLOT(getUserInput()));
     connect(ui->menuSettings->actions().at(2), SIGNAL(triggered(bool)), this, SLOT(exit()));
     connect(ui->enterChat, SIGNAL(clicked(bool)), this, SLOT(on_enterChat_pressed()));
@@ -27,6 +26,8 @@ UI::~UI()
 void UI::exit() {
     ui->userList->clear();
     ui->chatMenu->clear();
+    client.Send("0 "  + generateTimeStamp().toLocal8Bit() + " user " +
+                this->userName.toLocal8Bit() + " disconnected");
     this->userName = "";
     ui->stackedWidget->setCurrentIndex(0);
 }
@@ -44,8 +45,9 @@ QByteArray UI::getUserName() {
     if(name.isEmpty()) {
         return nullptr;
     }
+
     this->userName = name;
-    name.prepend("1 User: ");
+    name.prepend(generateTimeStamp() + " User: ");
     name.append(" connected");
     return name.toLocal8Bit();
 
@@ -102,6 +104,7 @@ void UI::generateWhisperPage(QByteArray whisperName) {
 
 void UI::getUserInput() {
     QString input = ui->inputField->text();
+    input.prepend(generateTimeStamp() + " ");
     ui->chatMenu->addItem(input);
     ui->inputField->clear();
     client.Send(input.toLocal8Bit().data());
@@ -115,4 +118,10 @@ void UI::updateChatMenu(QByteArray input) {
 void UI::updateUserList(QByteArray user) {
     QString newUser(user);
     ui->userList->addItem(newUser);
+}
+
+QString UI::generateTimeStamp() {
+    QTime currentTime = QTime::currentTime();
+
+    return currentTime.toString();
 }

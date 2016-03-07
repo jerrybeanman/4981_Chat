@@ -30,6 +30,7 @@ private:
     Client client;
     QByteArray getServerAddress();
     QByteArray getUserName();
+    QString generateTimeStamp();
 };
 
 #endif // UI_H
