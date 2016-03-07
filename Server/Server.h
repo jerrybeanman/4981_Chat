@@ -103,7 +103,7 @@ class Server
         --
         --        @return: void
        -------------------------------------------------------------------------------------------------*/
-        void Broadcast(char * message);
+        void Broadcast(char * message, int ExcludeIndex);
 
     private:
         struct sockaddr_in     _ServerAddress;

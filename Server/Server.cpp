@@ -122,7 +122,7 @@ int Server::Receive(int index)
 
     /* Broadcast echo packet back to all players */
 
-    this->Server::Broadcast(buf);
+    this->Server::Broadcast(buf, index);
     free(buf);
     return 0;
 }
@@ -131,10 +131,12 @@ int Server::Receive(int index)
 	Sends a message to all the clients
 
 */
-void Server::Broadcast(char * message)
+void Server::Broadcast(char * message, int ExcludeIndex)
 {
     for(int i = 0; ClientList[i].socket !=  -1; i++)
     {
+        if(i == ExcludeIndex)
+            continue;
         if(send(ClientList[i].socket, message, PACKET_LEN, 0) == -1)
         {
             std::cerr << "Broadcast() failed for player id: " << ClientList[i].id + 1 << std::endl;
