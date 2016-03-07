@@ -15,7 +15,7 @@
 #include <string.h>
 
 #define PACKET_LEN    256
-
+#define PORT        7000
 class Client
 {
   public:
@@ -61,14 +61,17 @@ class Client
 
           void * Receive();
 
-          int Send(const char * message, int size);
+          int Send(const char * message);
+
+          void Close();
+
+
 
 
   private:
 
         int                         _ClientSocket;
         struct sockaddr_in          _ServerAddress;
-        std::vector<sockaddr_in>    _ClientList;
 
 };
 

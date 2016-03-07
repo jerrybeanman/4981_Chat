@@ -1,4 +1,5 @@
 #include "Client.h"
+#include "ui.h"
 
 int Client::InitializeSocket(const char * name, short port)
 {
@@ -41,6 +42,7 @@ void * Client::RecvThread(void * client)
 void * Client::Receive()
 {
     int bytesRead;
+    UI ui;
     while(1)
     {
         int bytesToRead = PACKET_LEN;
@@ -64,7 +66,7 @@ void * Client::Receive()
             bytesToRead -= bytesRead;
         }
 
-        std::cout << message << std::endl;
+        ui.updateChatMenu(QByteArray(message));
 
         free(message);
     }
@@ -75,12 +77,17 @@ void * Client::Receive()
     Wrapper function for TCP send function. Failing to send prints an error
     message with the data intended to send.
 */
-int Client::Send(const char * message, int size)
+int Client::Send(const char * message)
 {
-    if (send(_ClientSocket, message, size, 0) == -1)
+    if (send(_ClientSocket, message, PACKET_LEN, 0) == -1)
     {
       std::cerr << "send() failed with errno: " << errno << std::endl;
       return -1;
     }
     return 0;
+}
+
+void Client::Close() {
+
+    close(this->_ClientSocket);
 }
