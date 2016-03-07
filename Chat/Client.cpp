@@ -79,3 +79,8 @@ int Client::Send(const char * message)
     }
     return 0;
 }
+
+void Client::Close() {
+
+    close(this->_ClientSocket);
+}

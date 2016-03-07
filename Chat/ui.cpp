@@ -28,6 +28,7 @@ void UI::exit() {
     ui->chatMenu->clear();
     client.Send("0 "  + generateTimeStamp().toLocal8Bit() + " user " +
                 this->userName.toLocal8Bit() + " disconnected");
+    client.Close();
     this->userName = "";
     ui->stackedWidget->setCurrentIndex(0);
 }
@@ -104,7 +105,7 @@ void UI::generateWhisperPage(QByteArray whisperName) {
 
 void UI::getUserInput() {
     QString input = ui->inputField->text();
-    input.prepend(generateTimeStamp() + " ");
+    input.prepend(generateTimeStamp() + " User: " + this->userName);
     ui->chatMenu->addItem(input);
     ui->inputField->clear();
     client.Send(input.toLocal8Bit().data());

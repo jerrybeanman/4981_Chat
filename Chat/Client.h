@@ -63,12 +63,15 @@ class Client
 
           int Send(const char * message);
 
+          void Close();
+
+
+
 
   private:
 
         int                         _ClientSocket;
         struct sockaddr_in          _ServerAddress;
-        std::vector<sockaddr_in>    _ClientList;
 
 };
 
