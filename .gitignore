@@ -2,7 +2,8 @@ reated by https://www.gitignore.io/api/c++,c,linux,qt,vim
 
 .ycm_extra_conf.*
 .idea/*
-
+Server/Server
+Client/Client
 ### C++ ###
 # Compiled Object files
 *.slo

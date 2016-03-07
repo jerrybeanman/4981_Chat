@@ -105,7 +105,7 @@ void UI::generateWhisperPage(QByteArray whisperName) {
 
 void UI::getUserInput() {
     QString input = ui->inputField->text();
-    input.prepend(generateTimeStamp() + " User: " + this->userName);
+    input.prepend(generateTimeStamp() + " " + this->userName + ":");
     ui->chatMenu->addItem(input);
     ui->inputField->clear();
     client.Send(input.toLocal8Bit().data());

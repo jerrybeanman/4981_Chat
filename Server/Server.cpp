@@ -107,21 +107,22 @@ int Server::Receive(int index)
             return -1;
         }
         packet += buf;
-    }
+        if(BytesRead == 0) /* client disconnected */
+        {
+            free(buf);
+            printf("Client %d has disconnected \n",  index+1);
+            close(ClientList[index].socket);
+            FD_CLR(ClientList[index].socket, &AllSet);
+            return 0;
+        }
 
-    if(BytesRead == 0) /* client disconnected */
-    {
-        printf("Client %d has left the lobby \n",  index+1);
-        close(ClientList[index].socket);
-        FD_CLR(ClientList[index].socket, &AllSet);
-        return 0;
     }
 
     std::cout << buf << std::endl;
 
     /* Broadcast echo packet back to all players */
 
-    this->Server::Broadcast(buf);
+    this->Server::Broadcast(buf, index);
     free(buf);
     return 0;
 }
@@ -130,10 +131,12 @@ int Server::Receive(int index)
 	Sends a message to all the clients
 
 */
-void Server::Broadcast(char * message)
+void Server::Broadcast(char * message, int ExcludeIndex)
 {
     for(int i = 0; ClientList[i].socket !=  -1; i++)
     {
+        if(i == ExcludeIndex)
+            continue;
         if(send(ClientList[i].socket, message, PACKET_LEN, 0) == -1)
         {
             std::cerr << "Broadcast() failed for player id: " << ClientList[i].id + 1 << std::endl;
