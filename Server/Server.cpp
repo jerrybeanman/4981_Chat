@@ -107,14 +107,15 @@ int Server::Receive(int index)
             return -1;
         }
         packet += buf;
-    }
+        if(BytesRead == 0) /* client disconnected */
+        {
+            free(buf);
+            printf("Client %d has disconnected \n",  index+1);
+            close(ClientList[index].socket);
+            FD_CLR(ClientList[index].socket, &AllSet);
+            return 0;
+        }
 
-    if(BytesRead == 0) /* client disconnected */
-    {
-        printf("Client %d has left the lobby \n",  index+1);
-        close(ClientList[index].socket);
-        FD_CLR(ClientList[index].socket, &AllSet);
-        return 0;
     }
 
     std::cout << buf << std::endl;

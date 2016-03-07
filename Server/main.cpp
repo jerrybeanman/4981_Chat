@@ -26,7 +26,7 @@ int main()
         Client tmpClient;
 
         Rset = TCPServer.AllSet;
-
+        printf("before select\n");
         // Blocking call for kernel socket events
         NumClients = select(TCPServer.MaxSocket + 1, &Rset, NULL, NULL, NULL);
 
