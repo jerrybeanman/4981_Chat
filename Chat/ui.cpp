@@ -90,19 +90,6 @@ void UI::on_enterChat_pressed()
     updateUserList(userName.toLatin1().data());
 }
 
-void UI::generateWhisperPage(QByteArray whisperName) {
-    QVBoxLayout *layout = new QVBoxLayout();
-    QListWidget *chatItems = new QListWidget();
-    chatItems->setWrapping(true);
-    chatItems->setWordWrap(true);
-    chatItems->setAutoScroll(true);
-    layout->addWidget(chatItems);
-
-    QWidget *whisperTab = new QWidget();
-    whisperTab->setLayout(layout);
-    ui->tabWidget->addTab(whisperTab, whisperName);
-}
-
 void UI::getUserInput() {
     QString input = ui->inputField->text();
     input.prepend(generateTimeStamp() + " " + this->userName + ":");
@@ -116,13 +103,11 @@ void UI::updateChatMenu(QByteArray input) {
     ui->chatMenu->addItem(newChatInput);
 }
 
-void UI::updateUserList(QByteArray user) {
-    QString newUser(user);
-    ui->userList->addItem(newUser);
+void UI::updateUserList(QByteArray newUser) {
+    ui->userList->addItem(QString(newUser));
 }
 
 QString UI::generateTimeStamp() {
     QTime currentTime = QTime::currentTime();
-
     return currentTime.toString();
 }
