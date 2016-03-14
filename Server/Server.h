@@ -24,6 +24,7 @@ struct Client
     int         id;
     int         socket;
     sockaddr_in connection;
+    std::string userName;
 };
 
 class Server
@@ -109,6 +110,7 @@ class Server
 
     private:
         struct sockaddr_in     _ServerAddress;
+        std::vector<std::string> connectedClients;
 
 
 };

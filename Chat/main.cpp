@@ -47,6 +47,7 @@ void loadStyleSheet(QApplication* application);
 ----------------------------------------------------------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
+
     QApplication a(argc, argv);
     loadStyleSheet(&a);
     UI w;

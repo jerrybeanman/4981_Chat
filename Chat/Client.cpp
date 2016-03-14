@@ -1,6 +1,5 @@
 #include "Client.h"
-#include "ui.h"
-
+#include <QtDebug>
 /*-----------------------------------------------------------------------------------------------
 --    Name:     [InitializeSocket]         Date:         [March 6th, 2016]
 --
@@ -56,12 +55,6 @@ int Client::Connect()
     return 0;
 }
 
-
-void * Client::RecvThread(void * client)
-{
-    return ((Client *)client)->Receive();
-}
-
 /*-----------------------------------------------------------------------------------------------
 --    Name:     [Receive]                  Date:         [March 6th, 2016]
 --
@@ -74,38 +67,32 @@ void * Client::RecvThread(void * client)
 --    Notes: Continuously calls recieve in a thread, and updates the application GUI whenever a
 --            message has been read from _ClientSocket
 ------------------------------------------------------------------------------------------------*/
-void * Client::Receive()
+QString Client::Receive()
 {
     int bytesRead;
-    UI ui;
-    while(1)
+    int bytesToRead = PACKET_LEN;
+    char *message = (char *) malloc(PACKET_LEN);
+    while((bytesRead = recv(_ClientSocket, message, bytesToRead, 0)) < PACKET_LEN)
     {
-        int bytesToRead = PACKET_LEN;
-        char *message = (char *) malloc(PACKET_LEN);
-        while((bytesRead = recv(_ClientSocket, message, bytesToRead, 0)) < PACKET_LEN)
+        //printf("Recv\n");
+        if(bytesRead < 0)
         {
-            //printf("Recv\n");
-            if(bytesRead < 0)
-            {
-                printf("recv() failed with errno: %d\n", errno);
-                free(message);
-                return (void *)errno;
-            }
-            if(bytesRead == 0)
-            {
-                printf("Server has closed the socket\n");
-                free(message);
-                return NULL;
-            }
-            message += bytesRead;
-            bytesToRead -= bytesRead;
+            qDebug() << "recv() failed with errno: " << errno;
+            free(message);
+            return "";
         }
-
-        ui.updateChatMenu(QByteArray(message));
-
-        free(message);
+        if(bytesRead == 0)
+        {
+            printf("Server has closed the socket\n");
+            free(message);
+            return "";
+        }
+        message += bytesRead;
+        bytesToRead -= bytesRead;
     }
-    return NULL;
+    QString returnMessage(message);
+    free(message);
+    return returnMessage;
 }
 
 /*-----------------------------------------------------------------------------------------------

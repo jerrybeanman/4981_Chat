@@ -34,6 +34,7 @@
 #include <QString>
 #include <QByteArray>
 #include "Client.h"
+#include "network_thread.h"
 namespace Ui {
 class UI;
 }
@@ -78,6 +79,9 @@ public:
     -- Deconstructor for the UI
     ----------------------------------------------------------------------------------------------------------------------*/
     ~UI();
+signals:
+    void operate(Client& c);
+public slots:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: updateChatMenu
     --
@@ -97,7 +101,7 @@ public:
     -- NOTES:
     -- Updates the main chat window with the input the user entered
     ----------------------------------------------------------------------------------------------------------------------*/
-    void updateChatMenu(QByteArray input);
+    void updateChatMenu(QString chatInput);
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: updateUserList
     --
@@ -117,7 +121,9 @@ public:
     -- NOTES:
     -- Updates the list view of the chat room with the newuser
     ----------------------------------------------------------------------------------------------------------------------*/
-    void updateUserList(QByteArray newUser);
+    void updateUserList(QString newUser);
+
+    void removeUser(const QString& user);
 private slots:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: getUserInput
@@ -177,13 +183,19 @@ private slots:
     ----------------------------------------------------------------------------------------------------------------------*/
     void on_enterChat_pressed();
 
+    void setFileWrite(bool value);
+
 private:
     Ui::UI *ui;
+    QThread *readThread;
     QString userName;
     Client client;
     QByteArray getServerAddress();
     QByteArray getUserName();
     QString generateTimeStamp();
+    bool writeToFile = false;
+
+    void writeFile(const QString& data);
 };
 
 #endif // UI_H

@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include "Client.h"
 
-#define SERVER_IP   "127.0.0.1"
+#define SERVER_IP   "192.168.1.65"
 #define PORT        7000
 int main()
 {

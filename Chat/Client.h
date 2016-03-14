@@ -13,6 +13,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <string.h>
+#include <QString>
 
 #define PACKET_LEN    256
 #define PORT        7000
@@ -57,8 +58,6 @@ class Client
         ------------------------------------------------------------------------------------------------*/
         int Connect();
 
-        static void * RecvThread(void * client);
-
         /*-----------------------------------------------------------------------------------------------
         --    Name:     [Receive]                  Date:         [March 6th, 2016]
         --
@@ -71,7 +70,7 @@ class Client
         --    Notes: Continuously calls recieve in a thread, and updates the application GUI whenever a
         --            message has been read from _ClientSocket
         ------------------------------------------------------------------------------------------------*/
-        void * Receive();
+        QString Receive();
 
         /*-----------------------------------------------------------------------------------------------
         --    Name:     [Receive]                  Date:         [March 6th, 2016]

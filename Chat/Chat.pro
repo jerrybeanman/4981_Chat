@@ -13,12 +13,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         ui.cpp \
-    Client.cpp
+    Client.cpp \
+    network_thread.cpp
 
 QMAKE_CXXFLAGS += -std=c++11
 
 HEADERS  += ui.h \
-    Client.h
+    Client.h \
+    network_thread.h
 
 FORMS    += ui.ui
 

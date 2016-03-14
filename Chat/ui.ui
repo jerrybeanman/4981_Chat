@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>600</height>
+    <width>800</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>500</width>
-    <height>600</height>
+    <width>800</width>
+    <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>500</width>
-    <height>600</height>
+    <width>800</width>
+    <height>500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -150,7 +150,7 @@
              <widget class="QTabWidget" name="tabWidget">
               <property name="maximumSize">
                <size>
-                <width>500</width>
+                <width>800</width>
                 <height>750</height>
                </size>
               </property>
@@ -172,18 +172,24 @@
                  <widget class="QListWidget" name="chatMenu">
                   <property name="maximumSize">
                    <size>
-                    <width>500</width>
-                    <height>750</height>
+                    <width>1000</width>
+                    <height>1200</height>
                    </size>
                   </property>
                   <property name="focusPolicy">
                    <enum>Qt::NoFocus</enum>
+                  </property>
+                  <property name="horizontalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
                   </property>
                   <property name="showDropIndicator" stdset="0">
                    <bool>false</bool>
                   </property>
                   <property name="isWrapping" stdset="0">
                    <bool>true</bool>
+                  </property>
+                  <property name="resizeMode">
+                   <enum>QListView::Adjust</enum>
                   </property>
                   <property name="wordWrap">
                    <bool>true</bool>
@@ -211,6 +217,9 @@
                  <bool>true</bool>
                 </property>
                </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4"/>
               </item>
              </layout>
             </item>
@@ -271,7 +280,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>500</width>
+     <width>800</width>
      <height>25</height>
     </rect>
    </property>
@@ -290,6 +299,7 @@
     </property>
     <addaction name="actionChange_User_Name"/>
     <addaction name="separator"/>
+    <addaction name="actionFile_Dump"/>
     <addaction name="actionSignout"/>
    </widget>
    <addaction name="menuSettings"/>
@@ -302,6 +312,14 @@
   <action name="actionSignout">
    <property name="text">
     <string>Sign Out</string>
+   </property>
+  </action>
+  <action name="actionFile_Dump">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>File Dump</string>
    </property>
   </action>
  </widget>

@@ -6,16 +6,23 @@
 #include <pthread.h>
 #include <QTime>
 #include "Client.h"
+#include <QFile>
+#include <QTextStream>
+#include <QList>
+#include <QtAlgorithms>
 
 UI::UI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::UI)
 {
     ui->setupUi(this);
-    connect(ui->inputField, SIGNAL(returnPressed()), this, SLOT(getUserInput()));
-    connect(ui->menuSettings->actions().at(2), SIGNAL(triggered(bool)), this, SLOT(exit()));
+
+    connect(ui->menuSettings->actions().at(3), SIGNAL(triggered(bool)), this, SLOT(exit()));
+    connect(ui->menuSettings->actions().at(2), SIGNAL(toggled(bool)), this, SLOT(setFileWrite(bool)));
+
     connect(ui->enterChat, SIGNAL(clicked(bool)), this, SLOT(on_enterChat_pressed()));
     connect(ui->userNameInput, SIGNAL(returnPressed()), this, SLOT(on_enterChat_pressed()));
+    connect(ui->inputField, SIGNAL(returnPressed()), this, SLOT(getUserInput()));
 }
 
 UI::~UI()
@@ -26,7 +33,7 @@ UI::~UI()
 void UI::exit() {
     ui->userList->clear();
     ui->chatMenu->clear();
-    client.Send("0 "  + generateTimeStamp().toLocal8Bit() + " user " +
+    client.Send((char )18 + generateTimeStamp().toLocal8Bit() + " user " +
                 this->userName.toLocal8Bit() + " disconnected");
     client.Close();
     this->userName = "";
@@ -48,24 +55,24 @@ QByteArray UI::getUserName() {
     }
 
     this->userName = name;
-    name.prepend(generateTimeStamp() + " User: ");
+    name.prepend((char) 17 + generateTimeStamp() + " User: ");
     name.append(" connected");
     return name.toLocal8Bit();
 
 }
 
 void UI::on_enterChat_pressed()
-{   QMessageBox loginError;
+{   QMessageBox error;
     QByteArray ipAddr = getServerAddress();
     if(ipAddr.isEmpty()) {
-        loginError.critical(0, "Login Error", "Enter a valid IP address");
-        loginError.setFixedSize(500,200);
+        error.critical(0, "Login Error", "Enter a valid IP address");
+        error.setFixedSize(500,200);
         return;
     }
     QByteArray userConnectInfo = getUserName();
     if(userConnectInfo.isEmpty()) {
-        loginError.critical(0, "Login Error", "Enter a username");
-        loginError.setFixedSize(500,200);
+        error.critical(0, "Login Error", "Enter a username");
+        error.setFixedSize(500,200);
         return;
     }
 
@@ -74,16 +81,24 @@ void UI::on_enterChat_pressed()
     }
 
     if(client.Connect() < 0) {
+        error.critical(0, "Connection Error", "Unable to connect to the server, please try again later");
         return;
     }
 
+
+
+    readThread = new QThread();
+    network_thread *worker = new network_thread();
+    worker->moveToThread(readThread);
+    connect(worker, SIGNAL(messageReceived(QString)), this, SLOT(updateChatMenu(QString)));
+    connect(worker, SIGNAL(userConnected(QString)), this, SLOT(updateUserList(QString)));
+    connect(worker, SIGNAL(userDisconnected(QString)), this, SLOT(removeUser(QString)));
+    connect(worker, SIGNAL(threadRequested()), readThread, SLOT(start()));
+    connect(readThread, SIGNAL(started()), worker, SLOT(receiveThread()));
+    connect(worker, SIGNAL(finished()), readThread, SLOT(quit()), Qt::DirectConnection);
+    worker->requestThread(client);
+
     client.Send(userConnectInfo.data());
-
-    pthread_t readThread;
-    if(pthread_create(&readThread, NULL, &Client::RecvThread, (void *) &client) < 0) {
-          return;
-    }
-
     ui->userNameInput->clear();
     ui->serverIPAddress->clear();
     ui->stackedWidget->setCurrentIndex(1);
@@ -96,18 +111,48 @@ void UI::getUserInput() {
     ui->chatMenu->addItem(input);
     ui->inputField->clear();
     client.Send(input.toLocal8Bit().data());
+    if(writeToFile) {
+        writeFile(input);
+    }
 }
 
-void UI::updateChatMenu(QByteArray input) {
-    QString newChatInput(input);
-    ui->chatMenu->addItem(newChatInput);
+void UI::updateChatMenu(QString chatInput) {
+    ui->chatMenu->addItem(chatInput);
+    if(writeToFile) {
+        writeFile(chatInput);
+    }
 }
 
-void UI::updateUserList(QByteArray newUser) {
-    ui->userList->addItem(QString(newUser));
+void UI::updateUserList(QString newUser) {
+    ui->userList->addItem(newUser);
 }
 
 QString UI::generateTimeStamp() {
     QTime currentTime = QTime::currentTime();
     return currentTime.toString();
+}
+
+void UI::setFileWrite(bool value) {
+    writeToFile = value;
+}
+
+void UI::removeUser(const QString& user) {
+  QList<QListWidgetItem *> users = ui->userList->findItems(user, Qt::MatchFixedString | Qt::MatchCaseSensitive);
+  qDeleteAll(users);
+
+}
+
+void UI::writeFile(const QString& data) {
+    QFile file("output.txt");
+
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+        QMessageBox::critical(0, "File Error", "Unable to log chat please try again later.");
+        writeToFile = false;
+        return;
+    }
+
+    QTextStream fileOutput(&file);
+    fileOutput << data << "\n";
+
+    file.close();
 }

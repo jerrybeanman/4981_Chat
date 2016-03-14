@@ -137,6 +137,7 @@ int Server::Receive(int index)
         // client disconnected
         if(BytesRead == 0)
         {
+            this->Server::Broadcast(buf, index);
             free(buf);
             printf("Client %d has disconnected \n",  index+1);
             close(ClientList[index].socket);
