@@ -124,6 +124,8 @@ public slots:
     void updateUserList(QString newUser);
 
     void removeUser(const QString& user);
+
+    void tokenizeUserList(const QString& list);
 private slots:
     /*------------------------------------------------------------------------------------------------------------------
     -- FUNCTION: getUserInput

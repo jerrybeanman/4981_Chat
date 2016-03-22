@@ -6,14 +6,18 @@ void network_thread::receiveThread() {
         QString receivedMessage = client.Receive();
         qDebug() << "messaged received: " << receivedMessage;
         if(receivedMessage.isEmpty()) {
-            break;
+            continue;
         }
+
         if(receivedMessage[0] == (char)17) {
             emit userConnected(receivedMessage.section(' ', 2, 2));
         } else if(receivedMessage[0] == (char)18) {
             emit userDisconnected(receivedMessage.section(' ', 2, 2));
+        } else if(receivedMessage[0] == (char) 19){
+            receivedMessage.remove(0,1);
+            emit userList(receivedMessage);
         } else {
-            emit messageReceived(receivedMessage);
+             emit messageReceived(receivedMessage);
         }
     }
 }

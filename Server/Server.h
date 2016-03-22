@@ -1,6 +1,7 @@
 #ifndef SERVER_TCP
 #define SERVER_TCP
 #include <iostream>
+#include <algorithm>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -110,7 +111,12 @@ class Server
 
     private:
         struct sockaddr_in     _ServerAddress;
-        std::vector<std::string> connectedClients;
+        std::vector<std::string> connectedUsers;
+
+        void addUser(const char* name);
+        void removeUser(const char* name);
+        std::string generateUserList();
+        void SendToClient(char *message, int index);
 
 
 };

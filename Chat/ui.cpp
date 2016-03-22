@@ -33,9 +33,12 @@ UI::~UI()
 void UI::exit() {
     ui->userList->clear();
     ui->chatMenu->clear();
-    client.Send((char )18 + generateTimeStamp().toLocal8Bit() + " user " +
-                this->userName.toLocal8Bit() + " disconnected");
+    QString disconnectMessage("[" + generateTimeStamp().toLocal8Bit() + "] " + "User: " +
+                              this->userName.toLocal8Bit() + " disconnected");
+    disconnectMessage.prepend((char)18);
+    client.Send(disconnectMessage.toLocal8Bit().data());
     client.Close();
+    readThread->quit();
     this->userName = "";
     ui->stackedWidget->setCurrentIndex(0);
 }
@@ -55,7 +58,8 @@ QByteArray UI::getUserName() {
     }
 
     this->userName = name;
-    name.prepend((char) 17 + generateTimeStamp() + " User: ");
+    name.prepend("[" + generateTimeStamp().toLocal8Bit() + "] " + "User: ");
+    name.prepend((char) 17);
     name.append(" connected");
     return name.toLocal8Bit();
 
@@ -90,24 +94,26 @@ void UI::on_enterChat_pressed()
     readThread = new QThread();
     network_thread *worker = new network_thread();
     worker->moveToThread(readThread);
+
     connect(worker, SIGNAL(messageReceived(QString)), this, SLOT(updateChatMenu(QString)));
+    connect(worker, SIGNAL(userList(QString)), this, SLOT(tokenizeUserList(QString)));
     connect(worker, SIGNAL(userConnected(QString)), this, SLOT(updateUserList(QString)));
     connect(worker, SIGNAL(userDisconnected(QString)), this, SLOT(removeUser(QString)));
     connect(worker, SIGNAL(threadRequested()), readThread, SLOT(start()));
     connect(readThread, SIGNAL(started()), worker, SLOT(receiveThread()));
     connect(worker, SIGNAL(finished()), readThread, SLOT(quit()), Qt::DirectConnection);
+
     worker->requestThread(client);
 
     client.Send(userConnectInfo.data());
     ui->userNameInput->clear();
     ui->serverIPAddress->clear();
     ui->stackedWidget->setCurrentIndex(1);
-    updateUserList(userName.toLatin1().data());
 }
 
 void UI::getUserInput() {
     QString input = ui->inputField->text();
-    input.prepend(generateTimeStamp() + " " + this->userName + ":");
+    input.prepend("[" + generateTimeStamp().toLocal8Bit() + "] " + this->userName + ": ");
     ui->chatMenu->addItem(input);
     ui->inputField->clear();
     client.Send(input.toLocal8Bit().data());
@@ -155,4 +161,11 @@ void UI::writeFile(const QString& data) {
     fileOutput << data << "\n";
 
     file.close();
+}
+
+void UI::tokenizeUserList(const QString& list) {
+    QStringList userList = list.split(' ', QString::SkipEmptyParts);
+    for(QString& user : userList) {
+        updateUserList(user);
+    }
 }

@@ -15,6 +15,7 @@ public slots:
     void receiveThread();
 signals:
     void messageReceived(const QString& message);
+    void userList(const QString& userList);
     void threadRequested();
     void finished();
     void userConnected(const QString& user);
