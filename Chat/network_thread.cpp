@@ -22,7 +22,7 @@ void network_thread::receiveThread() {
     }
 }
 
-void network_thread::requestThread(Client &c) {
-    client = c;
+void network_thread::requestThread(Client &client) {
+    this->client = client;
     emit threadRequested();
 }
