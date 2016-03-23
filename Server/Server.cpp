@@ -141,6 +141,7 @@ int Server::Receive(int index)
             printf("Client %d has disconnected \n",  index+1);
             close(ClientList[index].socket);
             FD_CLR(ClientList[index].socket, &AllSet);
+            ClientList[index].socket = -1;
             return 1;
         }
 
@@ -154,6 +155,7 @@ int Server::Receive(int index)
         this->Server::removeUser(buf);
         close(ClientList[index].socket);
         FD_CLR(ClientList[index].socket, &AllSet);
+        ClientList[index].socket = -1;
     }
 
     /* Broadcast echo packet back to all players */

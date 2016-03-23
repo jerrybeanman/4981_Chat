@@ -38,7 +38,9 @@ void UI::exit() {
     disconnectMessage.prepend((char)18);
     client.Send(disconnectMessage.toLocal8Bit().data());
     client.Close();
+    worker->connected = false;
     readThread->quit();
+    delete(worker);
     this->userName = "";
     ui->stackedWidget->setCurrentIndex(0);
 }
@@ -92,7 +94,8 @@ void UI::on_enterChat_pressed()
 
 
     readThread = new QThread();
-    network_thread *worker = new network_thread();
+    worker = new network_thread();
+    worker->connected = true;
     worker->moveToThread(readThread);
 
     connect(worker, SIGNAL(messageReceived(QString)), this, SLOT(updateChatMenu(QString)));

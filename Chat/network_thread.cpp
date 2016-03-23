@@ -2,11 +2,11 @@
 #include <QtDebug>
 
 void network_thread::receiveThread() {
-    while(1) {
+    while(connected) {
         QString receivedMessage = client.Receive();
         qDebug() << "messaged received: " << receivedMessage;
         if(receivedMessage.isEmpty()) {
-            continue;
+            break;
         }
 
         if(receivedMessage[0] == (char)17) {

@@ -11,6 +11,7 @@ class network_thread : public QObject
 public:
     explicit network_thread(QObject *parent = 0) : QObject(parent) {}
     void requestThread(Client& c);
+    bool connected;
 public slots:
     void receiveThread();
 signals:
