@@ -110,6 +110,10 @@ int Server::Accept(Client * client)
 --
 --    Designer: [Jerry Jia]                Programmer:   [Jerry Jia]
 --
+--    REVISIONS: (Date and Description)
+--                  Scott Plummer -- March 12: Created user table and implemented user connection and disconection parsing.
+--
+--
 --    Interface:  int Receive(int index)
 --                [index] Index in CLientList to call recv() on
 --
@@ -141,6 +145,7 @@ int Server::Receive(int index)
             printf("Client %d has disconnected \n",  index+1);
             close(ClientList[index].socket);
             FD_CLR(ClientList[index].socket, &AllSet);
+            ClientList[index].socket = -1;
             return 1;
         }
 
@@ -154,6 +159,7 @@ int Server::Receive(int index)
         this->Server::removeUser(buf);
         close(ClientList[index].socket);
         FD_CLR(ClientList[index].socket, &AllSet);
+        ClientList[index].socket = -1;
     }
 
     /* Broadcast echo packet back to all players */
@@ -195,6 +201,25 @@ void Server::Broadcast(char * message, int ExcludeIndex)
     }
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: SendToClient
+--
+-- DATE: March 12, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer
+--
+-- INTERFACE:   SendToClient(char *message, int index)
+--                          message: message to send
+--                          index: index of the client to send to
+--
+-- RETURN: void
+--
+-- NOTES: Sends only to the specified client
+----------------------------------------------------------------------------------------------------------------------*/
 void Server::SendToClient(char *message, int index) 
 {
     if(send(ClientList[index].socket, message, PACKET_LEN, 0) == -1) {
@@ -203,6 +228,24 @@ void Server::SendToClient(char *message, int index)
     }
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: addUser
+--
+-- DATE: March 12, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer
+--
+-- INTERFACE:   void addUser(const char *name)
+--                      name: name of user to add
+--
+-- RETURN: void
+--
+-- NOTES: Adds the user to the list of connected users
+----------------------------------------------------------------------------------------------------------------------*/
 void Server::addUser(const char *name) 
 {
     std::string userName(name);
@@ -213,7 +256,25 @@ void Server::addUser(const char *name)
     connectedUsers.push_back(nameToken);
 }
 
-void Server::removeUser(const char *name) 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: removeUser
+--
+-- DATE: March 12, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer
+--
+-- INTERFACE:   void removeUser(const char *name)
+--                      name: name of user to remove
+--
+-- RETURN: void
+--
+-- NOTES: Removes the user to the list of connected users
+----------------------------------------------------------------------------------------------------------------------*/
+void Server::removeUser(const char *name)
 {
     std::string userName(name);
     std::size_t userNamePos =  userName.find(": ");
@@ -228,7 +289,24 @@ void Server::removeUser(const char *name)
     std::cout <<  std::endl;
 }
 
-std::string Server::generateUserList() 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: generateUserList
+--
+-- DATE: March 12, 2016
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Scott Plummer
+--
+-- PROGRAMMER: Scott Plummer
+--
+-- INTERFACE:   void generateUserList()
+--
+-- RETURN: The user table
+--
+-- NOTES: Generatles a string to send based ont he connected users. This string always begins with a DC3 character
+----------------------------------------------------------------------------------------------------------------------*/
+std::string Server::generateUserList()
 {
     std::string users(1, (char) 19);
 

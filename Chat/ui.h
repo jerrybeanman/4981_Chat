@@ -190,6 +190,7 @@ private slots:
 private:
     Ui::UI *ui;
     QThread *readThread;
+    network_thread *worker;
     QString userName;
     Client client;
     QByteArray getServerAddress();
