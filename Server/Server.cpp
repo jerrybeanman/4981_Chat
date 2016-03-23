@@ -195,14 +195,16 @@ void Server::Broadcast(char * message, int ExcludeIndex)
     }
 }
 
-void Server::SendToClient(char *message, int index) {
+void Server::SendToClient(char *message, int index) 
+{
     if(send(ClientList[index].socket, message, PACKET_LEN, 0) == -1) {
             std::cerr << "Broadcast() to single client  failed for player id: " << ClientList[index].id + 1 << std::endl;
             std::cerr << "errno: " << errno << std::endl;
     }
 }
 
-void Server::addUser(const char *name) {
+void Server::addUser(const char *name) 
+{
     std::string userName(name);
     std::size_t userNamePos =  userName.find(": ");
     std::string nameToken = userName.substr(userNamePos + 2, userName.find(" connected") -(userNamePos + 2));
@@ -211,23 +213,27 @@ void Server::addUser(const char *name) {
     connectedUsers.push_back(nameToken);
 }
 
-void Server::removeUser(const char *name) {
+void Server::removeUser(const char *name) 
+{
     std::string userName(name);
     std::size_t userNamePos =  userName.find(": ");
     std::string nameToken = userName.substr(userNamePos + 2, userName.find(" disconnected") -(userNamePos + 2));
 
     std::cout << "Removed user: " << nameToken << std::endl;
     connectedUsers.erase(std::remove(connectedUsers.begin(), connectedUsers.end(), nameToken), connectedUsers.end());
-    for(std::string& user: connectedUsers){
+    for(std::string& user: connectedUsers)
+    {
         std::cout << user << " ";
     }
     std::cout <<  std::endl;
 }
 
-std::string Server::generateUserList() {
+std::string Server::generateUserList() 
+{
     std::string users(1, (char) 19);
 
-    for(std::string& user: connectedUsers){
+    for(std::string& user: connectedUsers)
+    {
         users.append(user + " ");
     }
     return users;
